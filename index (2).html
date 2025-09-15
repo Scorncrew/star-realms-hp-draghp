@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Star Realms — HP Drag</title>
+<style>
+  :root{
+    --bg:#070a12; --panel:#0c1320; --panel-b:#1b2a41; --text:#eaf2ff; --muted:#9fb0c7;
+    --accent:#3ee7ff; --good:#22c55e; --bad:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 900px at 50% -300px,#0b1422 0%,#070a12 55%,#04070d 100%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  .wrap{max-width:1200px;margin:0 auto;padding:20px}
+  h1{margin:0 0 14px;font-size:22px;letter-spacing:.02em}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .panel{background:var(--panel);border:1px solid var(--panel-b);border-radius:14px;padding:14px;margin-bottom:12px}
+  .muted{color:var(--muted)}
+
+  /* inputs/buttons */
+  input,select{background:#0a121f;color:#fff;border:1px solid #2a3b52;border-radius:10px;padding:10px 12px}
+  input::placeholder{color:#8aa}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid #2a3b52;background:linear-gradient(180deg,#22344c,#16263b);color:#dff6ff;font-weight:800;cursor:pointer;transition:transform .08s ease, filter .15s ease}
+  .btn:hover{filter:brightness(1.05)}
+  .btn:active{transform:translateY(1px)}
+  .btn-acc{background:linear-gradient(180deg,#67e8f9,#22d3ee);border-color:#17b6c8;color:#01242a}
+  .btn-ghost{background:rgba(255,255,255,.06);border-color:#34465f;color:#e5eef7}
+  .btn-danger{background:linear-gradient(180deg,#ff808e,#ef4444);border-color:#c73b4a}
+
+  /* grid */
+  .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  @media (max-width:900px){ .cards{grid-template-columns:1fr} }
+
+  /* card */
+  .card{position:relative;border-radius:16px;overflow:hidden}
+  .card-inner{position:relative;background:radial-gradient(130% 140% at 50% -20%, rgba(255,255,255,.06), transparent 40%), #0b1522; border:1px solid var(--panel-b); padding:14px}
+  .card.dead .card-inner{filter:grayscale(0.85) brightness(0.7); opacity:0.8}
+  .card-header{display:flex;align-items:center;justify-content:space-between}
+  .card-name{flex:1;text-align:center;font-size:20px;font-weight:900;letter-spacing:.02em}
+  .hp-zone{user-select:none; -webkit-user-select:none}
+  .hp-number{font-size:56px;font-weight:900;text-align:center;color:#fff; text-shadow:0 0 12px rgba(255,255,255,.25)}
+  .hp-sub{font-size:13px;color:var(--muted);text-align:center;margin-top:2px}
+  .delta-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+  .delta-badge{font-size:28px;font-weight:900;padding:6px 10px;border-radius:10px;background:rgba(0,0,0,.25);backdrop-filter:blur(2px)}
+  .flash-heal{animation:flashG .5s ease}
+  .flash-dmg{animation:flashR .5s ease}
+  @keyframes flashG{0%{text-shadow:0 0 0 rgba(34,197,94,0)} 20%{text-shadow:0 0 16px rgba(34,197,94,.9)} 100%{text-shadow:0 0 0 rgba(34,197,94,0)}}
+  @keyframes flashR{0%{text-shadow:0 0 0 rgba(239,68,68,0)} 20%{text-shadow:0 0 16px rgba(239,68,68,.9)} 100%{text-shadow:0 0 0 rgba(239,68,68,0)}}
+
+  .io{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .io label{font-size:12px;color:var(--muted)}
+
+  .border{position:absolute;inset:-2px;border:2px solid;border-radius:16px;pointer-events:none;filter:drop-shadow(0 0 10px currentColor)}
+
+  /* log */
+  .log{max-height:240px;overflow:auto}
+  .log ul{list-style:none;margin:0;padding:0}
+  .log li{padding:7px 10px;border-radius:10px;background:#0a111b;border:1px solid #1f2b3c;margin-bottom:8px;font-size:14px}
+  .log time{color:var(--muted);margin-right:6px}
+  .v-green{color:#34d399; font-weight:800}
+  .v-red{color:#f87171; font-weight:800}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:9999px;background:rgba(255,255,255,.06);border:1px solid #334155}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <h1>⭐ Star Realms — HP трекер</h1>
+      <label class="badge"><input type="checkbox" id="allowOver" checked> Разрешить оверхил</label>
+    </div>
+    <div class="row">
+      <input id="pname" placeholder="Имя игрока"/>
+      <select id="pcolor">
+        <option value="#10b981">Зелёный</option>
+        <option value="#ef4444">Красный</option>
+        <option value="#3b82f6">Синий</option>
+        <option value="#eab308">Жёлтый</option>
+        <option value="#a78bfa">Фиолетовый</option>
+        <option value="#f97316">Оранжевый</option>
+        <option value="#22d3ee">Бирюзовый</option>
+        <option value="#f43f5e">Алая роза</option>
+        <option value="#84cc16">Лайм</option>
+        <option value="#8b5cf6">Индиго</option>
+      </select>
+      <button id="btn-add" class="btn btn-acc">＋ Добавить игрока</button>
+      <div class="row" style="margin-left:auto">
+        <button id="btn-new" class="btn">🧹 Новая партия</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cards" class="cards"></div>
+
+  <div class="panel">
+    <h2 style="margin:0 0 8px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.14em">📜 Летопись</h2>
+    <div class="log"><ul id="log"></ul></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const BASE_HP = 50;
+  const LS = 'sr-html-hpdrag-v1';
+  const $cards = document.getElementById('cards');
+  const $log = document.getElementById('log');
+
+  let state = load() || { players:[], allowOverheal:true, log:[] };
+  document.getElementById('allowOver').checked = !!state.allowOverheal;
+
+  function save(){ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} }
+  function load(){ try{ return JSON.parse(localStorage.getItem(LS)); }catch(e){ return null; } }
+  const now = ()=> new Date().toLocaleTimeString();
+  function addLog(html){ state.log.unshift({t: now(), html}); renderLog(); save(); }
+  function renderLog(){ $log.innerHTML = state.log.map(x=>`<li><time>[${x.t}]</time>${x.html}</li>`).join(''); }
+
+  // ===== Players CRUD
+  document.getElementById('btn-add').addEventListener('click', ()=>{
+    const name = (document.getElementById('pname').value||'Игрок').trim();
+    const color = document.getElementById('pcolor').value;
+    const id = crypto.randomUUID();
+    state.players.push({ id, name, color, hp: BASE_HP, overTotal:0, dead:false });
+    document.getElementById('pname').value='';
+    addLog(`Создана карточка: <b>${escapeHtml(name)}</b>`);
+    render(); save();
+  });
+
+  document.getElementById('allowOver').addEventListener('change', (e)=>{ state.allowOverheal = e.target.checked; save(); render(); });
+  document.getElementById('btn-new').addEventListener('click', ()=>{
+    state.players = state.players.map(p=>({ ...p, hp:BASE_HP, overTotal:0, dead:false }));
+    state.log = [];
+    addLog('Новая партия — все восстановлены до 50 HP');
+    render(); save();
+  });
+
+  function removePlayer(id){ const p = state.players.find(x=>x.id===id); state.players = state.players.filter(x=>x.id!==id); addLog(`Удалена карточка: <b>${escapeHtml(p?.name||id)}</b>`); render(); save(); }
+
+  // ===== HP logic
+  function applyDamage(id, v){
+    if(!v || v<=0) return;
+    const p = state.players.find(x=>x.id===id); if(!p) return;
+    if(p.dead) return; // заблокирован
+    const before = p.hp;
+    p.hp = Math.max(0, p.hp - v);
+    if(p.hp===0){ p.dead = true; }
+    flash(p._hpEl,'dmg');
+    addLog(`<b>${escapeHtml(p.name)}</b> получил урон на <span class="v-red">-${v}</span> (было ${before}) → ${fmtHp(p)}`);
+    render(); save();
+  }
+  function applyHeal(id, v){
+    if(!v || v<=0) return;
+    const p = state.players.find(x=>x.id===id); if(!p) return;
+    if(p.dead) return; // заблокирован
+    const before = p.hp;
+    let after = p.hp + v;
+    let addOver = 0;
+    if(!state.allowOverheal){ after = Math.min(BASE_HP, after); }
+    else {
+      const overBefore = Math.max(0, before - BASE_HP);
+      const overAfter  = Math.max(0, after  - BASE_HP);
+      addOver = Math.max(0, overAfter - overBefore);
+    }
+    p.hp = after;
+    p.overTotal += addOver;
+    flash(p._hpEl,'heal');
+    addLog(`<b>${escapeHtml(p.name)}</b> исцелился на <span class="v-green">+${v}</span> (было ${before}) → ${fmtHp(p)}${addOver>0?` <span class="muted">(+оверхил ${addOver})</span>`:''}`);
+    render(); save();
+  }
+
+  function fmtHp(p){
+    const cur = p.hp; const base = BASE_HP; const over = Math.max(0, p.hp - BASE_HP);
+    return `${cur}/${base}${state.allowOverheal && (p.overTotal>0||over>0)?` <span class=\"muted\">(+${p.overTotal})</span>`:''}`;
+  }
+
+  function flash(el, kind){ if(!el) return; el.classList.remove('flash-heal','flash-dmg'); void el.offsetWidth; el.classList.add(kind==='heal'?'flash-heal':'flash-dmg'); }
+
+  // ===== Render cards
+  function render(){
+    $cards.innerHTML='';
+    state.players.forEach(p=>{
+      const card = document.createElement('div');
+      card.className = 'card' + (p.dead?' dead':'');
+      card.innerHTML = `
+        <div class="border" style="color:${p.color}"></div>
+        <div class="card-inner">
+          <div class="card-header">
+            <button class="btn btn-danger btn-sm" data-act="del" title="Удалить" style="visibility:hidden">×</button>
+            <div class="card-name">${escapeHtml(p.name)}</div>
+            <button class="btn btn-ghost" data-act="del" title="Удалить">🗑</button>
+          </div>
+          <div class="hp-zone" data-act="drag">
+            <div class="hp-number">${p.hp}</div>
+            <div class="hp-sub">${fmtHp(p)}</div>
+            <div class="delta-overlay" style="display:none"><span class="delta-badge"></span></div>
+          </div>
+          <div class="io">
+            <div>
+              <label>Урон</label>
+              <input class="inp-dmg" inputmode="numeric" placeholder="напр. 5"/>
+            </div>
+            <div>
+              <label>Хил</label>
+              <input class="inp-heal" inputmode="numeric" placeholder="напр. 8"/>
+            </div>
+          </div>
+        </div>`;
+
+      // hooks
+      const btnDel = card.querySelector('[data-act="del"]');
+      btnDel.addEventListener('click', ()=> removePlayer(p.id));
+
+      // inputs
+      const idmg = card.querySelector('.inp-dmg');
+      const iheal= card.querySelector('.inp-heal');
+      idmg.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ const v=+idmg.value||0; idmg.value=''; applyDamage(p.id,v);} });
+      iheal.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ const v=+iheal.value||0; iheal.value=''; applyHeal(p.id,v);} });
+
+      // drag zone
+      const zone = card.querySelector('.hp-zone');
+      const hpNum = card.querySelector('.hp-number');
+      const sub   = card.querySelector('.hp-sub');
+      p._hpEl = hpNum;
+      const overlay = card.querySelector('.delta-overlay');
+      const badge = overlay.querySelector('.delta-badge');
+
+      let dragging=null; // {sx,sy,delta}
+      const PX = 12;
+      function start(ev){ if(p.dead) return; ev.preventDefault();
+        const sx = ev.clientX ?? (ev.touches && ev.touches[0]?.clientX) ?? 0;
+        const sy = ev.clientY ?? (ev.touches && ev.touches[0]?.clientY) ?? 0;
+        dragging = { sx, sy, delta:0 };
+        overlay.style.display='flex';
+        document.addEventListener('pointermove', move);
+        document.addEventListener('pointerup', end);
+        document.addEventListener('touchmove', move, { passive:false });
+        document.addEventListener('touchend', end);
+      }
+      function move(ev){ if(!dragging) return; const x = ev.clientX ?? (ev.touches && ev.touches[0]?.clientX) ?? dragging.sx; const y = ev.clientY ?? (ev.touches && ev.touches[0]?.clientY) ?? dragging.sy; const dx=x-dragging.sx; const dy=dragging.sy-y; const primary = Math.abs(dx)>=Math.abs(dy)? dx: dy; let d = Math.trunc(primary / PX); const min = -p.hp; const max = state.allowOverheal? 999 : (BASE_HP - p.hp); if(d<min) d=min; if(d>max) d=max; dragging.delta=d; badge.textContent = d>0? ('+'+d) : (d<0? d : '0'); badge.style.color = d>0? '#34d399' : (d<0? '#f87171':'#9fb0c7'); hpNum.textContent = Math.max(0, Math.min(p.hp + d, state.allowOverheal? 9999: BASE_HP)); sub.innerHTML = fmtHp(p); }
+      function end(){ if(!dragging) return; const val = dragging.delta|0; overlay.style.display='none'; dragging=null; if(val>0) applyHeal(p.id,val); else if(val<0) applyDamage(p.id,-val); }
+
+      zone.addEventListener('pointerdown', start);
+      zone.addEventListener('touchstart', start, { passive:false });
+
+      // border color
+      card.style.setProperty('--border', p.color);
+      card.querySelector('.border').style.borderColor = p.color;
+
+      $cards.appendChild(card);
+    });
+  }
+
+  function escapeHtml(s){ return s.replace(/[&<>"']/g, (c)=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]) ); }
+
+  // init
+  render();
+  renderLog();
+})();
+</script>
+</body>
+</html>
