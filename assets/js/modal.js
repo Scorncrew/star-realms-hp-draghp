@@ -1,6 +1,6 @@
-import { addPlayer } from '/assets/js/player.js';
-import { addLog } from '/assets/js/log.js';
-import { render } from '/assets/js/render.js';
+import { addPlayer } from './assets/js/player.js';
+import { addLog } from './assets/js/log.js';
+import { render } from './assets/js/render.js';
 
 function setupAddPlayerModal(state, $addPlayerModal, $addPlayerBtn, $addPlayerCancel, $addPlayerSubmit, $pname, $pcolor, $cards, $panelContent) {
 	function openAddPlayerModal() {
