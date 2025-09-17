@@ -71,33 +71,34 @@ import { resetGame } from './player.js';
 		if (e.target.checked) {
 			state.mode = 'drag';
 			save(state);
-			render(state, $cards, $panelContent);
+			render(state, $cards, $panelContent, $log);
 		}
 	});
 	document.getElementById('mode-input').addEventListener('change', (e) => {
 		if (e.target.checked) {
 			state.mode = 'input';
 			save(state);
-			render(state, $cards, $panelContent);
+			render(state, $cards, $panelContent, $log);
 		}
 	});
 
 	document.getElementById('allowOver').addEventListener('change', (e) => {
 		state.allowOverheal = e.target.checked;
 		save(state);
-		render(state, $cards, $panelContent);
+		render(state, $cards, $panelContent, $log);
 	});
 
 	document.getElementById('btn-new').addEventListener('click', () => {
 		const logMsg = resetGame(state);
 		addLog(state, logMsg);
-		render(state, $cards, $panelContent);
+		render(state, $cards, $panelContent, $log);
+		renderLog(state, $log);
 		save(state);
 	});
 
-	setupAddPlayerModal(state, $addPlayerModal, $addPlayerBtn, $addPlayerCancel, $addPlayerSubmit, $pname, $pcolor, $cards, $panelContent);
+	setupAddPlayerModal(state, $addPlayerModal, $addPlayerBtn, $addPlayerCancel, $addPlayerSubmit, $pname, $pcolor, $cards, $panelContent, $log);
 	setupFaqModal($faq, $btnFaq, $btnFaqCloseX, $faqClose);
 
-	render(state, $cards, $panelContent);
+	render(state, $cards, $panelContent, $log);
 	renderLog(state, $log);
 })();
