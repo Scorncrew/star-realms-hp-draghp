@@ -1,8 +1,8 @@
-import { getInitialState, save } from '/assets/js/state.js';
-import { addLog, renderLog } from '/assets/js/log.js';
-import { setupAddPlayerModal, setupFaqModal } from '/assets/js/modal.js';
-import { render } from '/assets/js/render.js';
-import { resetGame } from '/assets/js/player.js';
+import { getInitialState, save } from './assets/js/state.js';
+import { addLog, renderLog } from './assets/js/log.js';
+import { setupAddPlayerModal, setupFaqModal } from './assets/js/modal.js';
+import { render } from './assets/js/render.js';
+import { resetGame } from './assets/js/player.js';
 
 (function() {
 	"use strict";
