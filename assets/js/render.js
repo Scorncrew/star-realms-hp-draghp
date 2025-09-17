@@ -1,9 +1,9 @@
 import { BASE_HP, save } from './state.js';
 import { escapeHtml, flash } from './domUtils.js';
 import { applyDamage, applyHeal, fmtHp, removePlayer } from './player.js';
-import { addLog } from './log.js';
+import { addLog, renderLog } from './log.js';
 
-function render(state, $cards, $panelContent) {
+function render(state, $cards, $panelContent, $log) {
 	if (!$cards) return; // Prevent setting innerHTML on undefined
 	$cards.innerHTML = '';
 	state.players.forEach(p => {
@@ -51,7 +51,8 @@ function render(state, $cards, $panelContent) {
 		card.querySelector('[data-act="del"]').addEventListener('click', () => {
 			const logMsg = removePlayer(state, p.id);
 			addLog(state, logMsg);
-			render(state, $cards, $panelContent);
+			render(state, $cards, $panelContent, $log);
+			renderLog(state, $log);
 		});
 
 		const hpNum = card.querySelector('.hp-number');
@@ -69,7 +70,8 @@ function render(state, $cards, $panelContent) {
 					idmg.value = '';
 					const logMsg = applyDamage(state, p.id, v);
 					if (logMsg) addLog(state, logMsg);
-					render(state, $cards, $panelContent);
+					render(state, $cards, $panelContent, $log);
+					renderLog(state, $log);
 				}
 			});
 			iheal.addEventListener('keydown', (e) => {
@@ -78,7 +80,8 @@ function render(state, $cards, $panelContent) {
 					iheal.value = '';
 					const logMsg = applyHeal(state, p.id, v);
 					if (logMsg) addLog(state, logMsg);
-					render(state, $cards, $panelContent);
+					render(state, $cards, $panelContent, $log);
+					renderLog(state, $log);
 				}
 			});
 			bDmg.addEventListener('click', () => {
@@ -86,14 +89,16 @@ function render(state, $cards, $panelContent) {
 				idmg.value = '';
 				const logMsg = applyDamage(state, p.id, v);
 				if (logMsg) addLog(state, logMsg);
-				render(state, $cards, $panelContent);
+				render(state, $cards, $panelContent, $log);
+				renderLog(state, $log);
 			});
 			bHeal.addEventListener('click', () => {
 				const v = +iheal.value || 0;
 				iheal.value = '';
 				const logMsg = applyHeal(state, p.id, v);
 				if (logMsg) addLog(state, logMsg);
-				render(state, $cards, $panelContent);
+				render(state, $cards, $panelContent, $log);
+				renderLog(state, $log);
 			});
 		}
 
@@ -145,7 +150,8 @@ function render(state, $cards, $panelContent) {
 					const logMsg = applyDamage(state, p.id, -val);
 					if (logMsg) addLog(state, logMsg);
 				}
-				render(state, $cards, $panelContent);
+				render(state, $cards, $panelContent, $log);
+				renderLog(state, $log);
 			}
 			zone.addEventListener('pointerdown', start);
 			zone.addEventListener('touchstart', start, { passive: false });
