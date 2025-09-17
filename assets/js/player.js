@@ -1,5 +1,5 @@
-import { BASE_HP, save } from 'assets/js/state.js';
-import { escapeHtml, flash } from 'assets/js/domUtils.js';
+import { BASE_HP, save } from '/assets/js/state.js';
+import { escapeHtml, flash } from '/assets/js/domUtils.js';
 
 function addPlayer(state, name, color) {
 	const id = crypto.randomUUID();
