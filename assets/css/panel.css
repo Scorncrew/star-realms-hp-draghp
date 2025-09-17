@@ -1,0 +1,136 @@
+.panel {
+	background: var(--panel);
+	border: 1px solid var(--panel-b);
+	border-radius: 14px;
+	padding: 14px;
+	margin-bottom: 12px;
+}
+
+.panel-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.btn-toggle {
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: none;
+	background: transparent;
+	color: var(--muted);
+	cursor: pointer;
+	font-size: 12px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+}
+
+.btn-toggle:hover {
+	background: rgba(255, 255, 255, 0.1);
+	color: var(--text);
+}
+
+.btn-toggle.collapsed {
+	transform: rotate(-90deg);
+}
+
+.panel-content {
+	overflow: hidden;
+	transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+}
+
+.panel-content.collapsed {
+	max-height: 0 !important;
+	opacity: 0;
+	margin-top: -12px !important;
+	pointer-events: none;
+}
+
+.toplog {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	max-height: 50vh;
+	background: var(--panel);
+	border-top: 1px solid var(--panel-b);
+	z-index: 1000;
+	overflow: hidden;
+	transition: max-height 0.3s ease, opacity 0.3s ease;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.toplog.open {
+	opacity: 1;
+	pointer-events: auto;
+	max-height: 50vh;
+}
+
+.btn-log-close {
+	position: absolute;
+	top: 10px;
+	right: 14px;
+	background: transparent;
+	border: none;
+	color: var(--muted);
+	font-size: 24px;
+	cursor: pointer;
+	line-height: 1;
+	padding: 0;
+	z-index: 1001;
+}
+
+.btn-log-close:hover {
+	color: var(--text);
+}
+
+.log {
+	max-height: 40vh;
+	overflow: auto;
+}
+
+.log ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.log li {
+	padding: 7px 10px;
+	border-radius: 10px;
+	background: #0a111b;
+	border: 1px solid #1f2b3c;
+	margin-bottom: 8px;
+	font-size: 14px;
+}
+
+.log time {
+	color: var(--muted);
+	margin-right: 6px;
+}
+
+.v-green {
+	color: #34d399;
+	font-weight: 800;
+}
+
+.v-red {
+	color: #f87171;
+	font-weight: 800;
+}
+
+@media (max-width: 900px) and (orientation: landscape), (max-height: 420px) {
+	.panel {
+		padding: 10px;
+	}
+	.btn-toggle {
+		width: 20px;
+		height: 20px;
+		font-size: 10px;
+	}
+}
