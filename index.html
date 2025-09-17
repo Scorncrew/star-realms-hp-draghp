@@ -1,420 +1,103 @@
 <!doctype html>
 <html lang="ru">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Star Realms — HP v3.2 (mobile landscape compact)</title>
-<style>
-  :root{
-    --bg:#070a12; --panel:#0c1320; --panel-b:#1b2a41; --text:#eaf2ff; --muted:#9fb0c7;
-    --accent:#3ee7ff; --good:#22c55e; --bad:#ef4444;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 900px at 50% -300px,#0b1422 0%,#070a12 55%,#04070d 100%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-  .wrap{max-width:1200px;margin:0 auto;padding:20px}
-  h1{margin:0 0 10px;font-size:22px;letter-spacing:.02em}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  .panel{background:var(--panel);border:1px solid var(--panel-b);border-radius:14px;padding:14px;margin-bottom:12px}
-  .muted{color:var(--muted)}
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Star Realms — HP Tracker (mobile landscape compact)</title>
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="assets/css/base.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/card.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/panel.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/modal.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/buttons.css">
+		<link rel="icon" type="image/png" href="../favicon.png" />
+	</head>
+	<body>
+		<div class="wrap">
+			<div class="panel">
+				<div class="panel-header">
+					<h1>⭐ Star Realms — HP трекер</h1>
+					<button id="btn-toggle-panel" class="btn-toggle" title="Свернуть/развернуть панель">▼</button>
+				</div>
+				<div id="panel-content" class="panel-content">
+					<div class="row" style="justify-content:space-between;align-items:center">
+						<button id="btn-add-player" class="btn btn-dsg-acc btn-small" title="Добавить игрока"><i class="fa-solid fa-user-plus"></i></button>
+						<div class="row">
+							<div class="seg" role="tablist" aria-label="Режим управления HP">
+								<input type="radio" id="mode-drag" name="mode" value="drag" checked><label for="mode-drag"><img style="width: 25px;" src="assets/img/touch-swipe-svgrepo-com.svg"></label>
+								<input type="radio" id="mode-input" name="mode" value="input"><label for="mode-input"><img style="width: 25px;" src="assets/img/input-numbers.svg"></label>
+							</div>
+							<button id="btn-log" class="btn btn-ghost btn-small"><i class="fa-solid fa-scroll" style="color: yellow;"></i></button>
+							<button id="btn-faq" class="btn btn-ghost btn-small"><i class="fa-solid fa-question" style="color: red;"></i></button>
+							<label class="badge"><input type="checkbox" id="allowOver" checked> <i class="fa-solid fa-notes-medical" style="color: green;"></i></label>
+							<button id="btn-new" class="btn"><i class="fa-solid fa-repeat"></i></button>
+						</div>
+					</div>
+					<div id="toplog" class="toplog">
+						<div class="panel" style="margin-top:12px">
+							<button id="btn-log-close" class="btn-log-close" title="Закрыть летопись">×</button>
+							<div class="log"><ul id="log"></ul></div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-  /* inputs/buttons */
-  input,select{background:#0a121f;color:#fff;border:1px solid #2a3b52;border-radius:10px;padding:10px 12px}
-  input::placeholder{color:#8aa}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid #2a3b52;background:linear-gradient(180deg,#22344c,#16263b);color:#dff6ff;font-weight:800;cursor:pointer;transition:transform .08s ease, filter .15s ease}
-  .btn:hover{filter:brightness(1.05)}
-  .btn:active{transform:translateY(1px)}
-  .btn-acc{background:linear-gradient(180deg,#67e8f9,#22d3ee);border-color:#17b6c8;color:#01242a}
-  .btn-ghost{background:rgba(255,255,255,.06);border-color:#34465f;color:#e5eef7}
-  .btn-danger{background:linear-gradient(180deg,#ff808e,#ef4444);border-color:#c73b4a}
-  .btn-small{padding:8px 10px;font-size:14px;border-radius:10px}
+			<div id="cards" class="cards"></div>
+		</div>
 
-  /* segmented control */
-  .seg{display:inline-flex;background:#0a111c;border:1px solid #2a3b52;border-radius:9999px;overflow:hidden}
-  .seg input{display:none}
-  .seg label{padding:8px 12px;cursor:pointer;color:#bcd; user-select:none}
-  .seg input:checked + label{background:linear-gradient(180deg,#67e8f9,#22d3ee);color:#01242a;font-weight:900}
+		<div id="add-player-modal" class="modal" aria-hidden="true">
+			<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="add-player-title">
+				<h3 id="add-player-title"><i class="fa-solid fa-user-plus"></i> Добавить игрока</h3>
+				<div class="muted">Заполните данные для нового игрока</div>
+				<div class="form-group">
+					<div>
+						<label for="pname">Имя игрока:</label>
+						<input id="pname" placeholder="Введите имя игрока" class="form-input"/>
+					</div>
+					<div>
+						<label for="pcolor">Цвет игрока:</label>
+						<select id="pcolor" class="form-input">
+							<option value="#10b981">Зелёный</option>
+							<option value="#ef4444">Красный</option>
+							<option value="#3b82f6">Синий</option>
+							<option value="#eab308">Жёлтый</option>
+							<option value="#a78bfa">Фиолетовый</option>
+							<option value="#f97316">Оранжевый</option>
+							<option value="#22d3ee">Бирюзовый</option>
+							<option value="#f43f5e">Алая роза</option>
+							<option value="#84cc16">Лайм</option>
+							<option value="#8b5cf6">Индиго</option>
+						</select>
+					</div>
+				</div>
+				<div class="modal-actions">
+					<button id="add-player-cancel" class="btn btn-ghost btn-small">Отмена</button>
+					<button id="add-player-submit" class="btn btn-acc btn-small">Добавить</button>
+				</div>
+			</div>
+		</div>
 
-  /* grid */
-  .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
-  /* Portrait phones default: 1 column */
-  @media (max-width:540px) and (orientation:portrait){
-    .cards{grid-template-columns:1fr; gap:14px}
-  }
-  /* Mobile landscape & small screens: enforce 2 columns and compact cards */
-  @media (max-width:900px) and (orientation:landscape), (max-height:420px){
-    .wrap{max-width:100vw;padding:10px}
-    .cards{grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
-    .panel{padding:10px}
-    h1{font-size:18px}
-    .btn{padding:8px 10px;border-radius:10px}
-    .btn-small{padding:6px 8px;font-size:12px}
-    input,select{padding:8px 10px;border-radius:8px}
-    .card-shell::before{inset:-4px;border-radius:20px;padding:2px}
-    .card-shell::after{inset:-7px;border-radius:24px}
-    .card-inner{padding:10px}
-    .card-name{font-size:16px}
-    .hp-number{font-size:40px}
-    .hp-sub{font-size:12px}
-    .io{gap:8px}
-  }
+		<div id="faq" class="modal" aria-hidden="true">
+			<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="faq-title">
+				<h3 id="faq-title">ЧАВО — как пользоваться трекером</h3>
+				<button id="btn-faq-close-x" class="btn-modal-close" title="Закрыть">×</button>
+				<div class="muted">Короткая сводка правил и возможностей интерфейса.</div>
+				<div class="faq-grid">
+					<div class="faq-item"><b>Создание игрока.</b> Нажмите кнопку "+" в панели управления, введите имя, выберите цвет и нажмите «Добавить». Карточка появится ниже. Цвет определяет неоновую подсветку и внешнюю окантовку.</div>
+					<div class="faq-item"><b>Режимы управления HP.</b> Переключатель «Прокрутка/Ввод чисел» в шапке. В «Прокрутке» тяните число HP мышью/пальцем (влево/вниз — урон, вправо/вверх — хил). В «Вводе» — вводите число и жмите «Применить» или Enter.</div>
+					<div class="faq-item"><b>Оверхил.</b> Чекбокс «Оверхил» разрешает HP выше 50. Сумма сверхбазового лечения показывается как (+X).</div>
+					<div class="faq-item"><b>Летопись.</b> Кнопка «📜 Летопись» раскрывает/скрывает журнал действий. Для каждого события пишется время, величина урона/хила и состояние HP до/после.</div>
+					<div class="faq-item"><b>Обнуление.</b> «Новая партия» восстанавливает всех к 50 HP, снимает блокировки и очищает летопись.</div>
+					<div class="faq-item"><b>Блокировка павших.</b> Если HP падает до 0, карточка сереет и блокируется до «Новой партии».</div>
+					<div class="faq-item"><b>Локальное сохранение.</b> Все данные хранятся в вашем браузере (localStorage). Открыв страницу снова — увидите свою последнюю сессию.</div>
+					<div class="faq-item"><b>Мобильные жесты.</b> На телефоне дергаем по числу HP пальцем. Страница блокирует скролл во время перетаскивания.</div>
+				</div>
+				<div class="modal-actions">
+					<button id="faq-close" class="btn btn-acc btn-small">Понятно</button>
+				</div>
+			</div>
+		</div>
 
-  /* OUTER PERIMETER NEON (FIXED) */
-  .card-shell{position:relative;border-radius:22px;transition:filter .2s ease}
-  .card-shell.dead{filter:grayscale(.8) brightness(.9) saturate(.7)}
-  .card-shell::before{
-    content:""; position:absolute; inset:-6px; border-radius:26px; padding:3px;
-    background: conic-gradient(
-      from 0deg,
-      color-mix(in oklab, var(--glow) 88%, white 12%),
-      color-mix(in oklab, var(--glow) 55%, black 20%),
-      color-mix(in oklab, var(--glow) 88%, white 12%)
-    );
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    filter: drop-shadow(0 0 10px color-mix(in oklab, var(--glow) 80%, transparent)) drop-shadow(0 0 26px color-mix(in oklab, var(--glow) 60%, transparent));
-    pointer-events:none;
-  }
-  .card-shell::after{
-    content:""; position:absolute; inset:-10px; border-radius:30px;
-    background: radial-gradient(60% 60% at 50% 50%, color-mix(in oklab, var(--glow) 40%, transparent) 0%, transparent 70%);
-    filter: blur(18px); opacity:.65; pointer-events:none;
-  }
-
-  /* card + inner neon */
-  .card{position:relative;border-radius:16px;overflow:hidden; --glow:#22d3ee}
-  .card-inner{position:relative;background:radial-gradient(130% 140% at 50% -20%, rgba(255,255,255,.06), transparent 40%), #0b1522; border:1px solid var(--panel-b); padding:14px; border-radius:16px}
-  .card.dead .card-inner{filter:grayscale(0.85) brightness(0.75); opacity:0.85}
-  .card-header{display:flex;align-items:center;justify-content:space-between}
-  .card-name{flex:1;text-align:center;font-size:20px;font-weight:900;letter-spacing:.02em;text-shadow:0 0 10px color-mix(in oklab, var(--glow) 70%, transparent)}
-  .hp-zone{user-select:none; -webkit-user-select:none}
-  .hp-number{font-size:56px;font-weight:900;text-align:center;color:#fff; text-shadow:0 0 14px color-mix(in oklab, var(--glow) 70%, transparent), 0 0 10px rgba(255,255,255,.2)}
-  .hp-sub{font-size:13px;color:var(--muted);text-align:center;margin-top:2px}
-  .delta-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-  .delta-badge{font-size:28px;font-weight:900;padding:6px 10px;border-radius:10px;background:rgba(0,0,0,.25);backdrop-filter:blur(2px)}
-  .flash-heal{animation:flashG .5s ease}
-  .flash-dmg{animation:flashR .5s ease}
-  @keyframes flashG{0%{text-shadow:0 0 0 rgba(34,197,94,0)} 20%{text-shadow:0 0 16px rgba(34,197,94,.9)} 100%{text-shadow:0 0 0 rgba(34,197,94,0)}}
-  @keyframes flashR{0%{text-shadow:0 0 0 rgba(239,68,68,0)} 20%{text-shadow:0 0 16px rgba(239,68,68,.9)} 100%{text-shadow:0 0 0 rgba(239,68,68,0)}}
-
-  .io{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-  .io label{font-size:12px;color:var(--muted)}
-  .io .row{gap:6px}
-
-  /* Inner neon frames */
-  .neon{position:absolute;inset:-2px;border-radius:16px;pointer-events:none}
-  .neon::before, .neon::after{content:"";position:absolute;inset:0;border-radius:inherit}
-  .neon::before{box-shadow:0 0 10px var(--glow), 0 0 24px var(--glow), 0 0 48px color-mix(in oklab, var(--glow) 60%, transparent); border:2px solid color-mix(in oklab, var(--glow) 60%, transparent)}
-  .neon::after{inset:-8px; filter:blur(12px); box-shadow:0 0 35px color-mix(in oklab, var(--glow) 60%, transparent); opacity:.7}
-  .neon-pulse{animation:neonPulse 3s ease-in-out infinite}
-  @keyframes neonPulse{0%,100%{opacity:.9}50%{opacity:1}}
-
-  /* Edge neon (FIXED — no marquee) */
-  .neon-edge{position:absolute; inset:0; border-radius:16px; pointer-events:none; border:2px solid transparent;
-    background: linear-gradient(90deg, var(--glow), color-mix(in oklab, var(--glow) 50%, white 0%), var(--glow)) border-box,
-                linear-gradient(#0b1522,#0b1522) padding-box;
-    background-size: 300% 100%;
-    animation: none; /* fixed */ 
-    filter: drop-shadow(0 0 12px var(--glow)) drop-shadow(0 0 26px color-mix(in oklab, var(--glow) 60%, transparent));
-    mix-blend-mode: screen;
-  }
-
-  /* Top collapsible log */
-  .toplog{overflow:hidden;max-height:0;transition:max-height .25s ease, opacity .25s ease;opacity:0}
-  .toplog.open{max-height:45vh;opacity:1}
-  .log{max-height:40vh;overflow:auto}
-  .log ul{list-style:none;margin:0;padding:0}
-  .log li{padding:7px 10px;border-radius:10px;background:#0a111b;border:1px solid #1f2b3c;margin-bottom:8px;font-size:14px}
-  .log time{color:var(--muted);margin-right:6px}
-  .v-green{color:#34d399; font-weight:800}
-  .v-red{color:#f87171; font-weight:800}
-
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:9999px;background:rgba(255,255,255,.06);border:1px solid #334155}
-
-  /* FAQ modal */
-  .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,12,.55); backdrop-filter: blur(6px); z-index:50}
-  .modal.open{display:flex}
-  .modal-card{width:min(860px,90vw); max-height:85vh; overflow:auto; background:var(--panel); border:1px solid var(--panel-b); border-radius:16px; padding:16px 18px 18px}
-  .modal-card h3{margin:0 0 10px; font-size:20px}
-  .modal-card .muted{margin-bottom:12px}
-  .modal-card .faq-grid{display:grid; grid-template-columns:1fr; gap:10px}
-  .modal-card .faq-item{background:#0a111b; border:1px solid #1f2b3c; border-radius:12px; padding:10px 12px}
-  .modal-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:10px}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <div class="panel">
-    <div class="row" style="justify-content:space-between;align-items:center">
-      <h1>⭐ Star Realms — HP трекер (v3.2)</h1>
-      <div class="row">
-        <div class="seg" role="tablist" aria-label="Режим управления HP">
-          <input type="radio" id="mode-drag" name="mode" value="drag" checked><label for="mode-drag">Прокрутка</label>
-          <input type="radio" id="mode-input" name="mode" value="input"><label for="mode-input">Ввод чисел</label>
-        </div>
-        <button id="btn-log" class="btn btn-ghost btn-small">📜 Летопись</button>
-        <button id="btn-faq" class="btn btn-ghost btn-small">❓ ЧАВО</button>
-        <label class="badge"><input type="checkbox" id="allowOver" checked> Оверхил</label>
-      </div>
-    </div>
-    <div id="toplog" class="toplog">
-      <div class="panel" style="margin-top:12px">
-        <div class="log"><ul id="log"></ul></div>
-      </div>
-    </div>
-
-    <div class="row" style="margin-top:8px">
-      <input id="pname" placeholder="Имя игрока"/>
-      <select id="pcolor">
-        <option value="#10b981">Зелёный</option>
-        <option value="#ef4444">Красный</option>
-        <option value="#3b82f6">Синий</option>
-        <option value="#eab308">Жёлтый</option>
-        <option value="#a78bfa">Фиолетовый</option>
-        <option value="#f97316">Оранжевый</option>
-        <option value="#22d3ee">Бирюзовый</option>
-        <option value="#f43f5e">Алая роза</option>
-        <option value="#84cc16">Лайм</option>
-        <option value="#8b5cf6">Индиго</option>
-      </select>
-      <button id="btn-add" class="btn btn-acc">＋ Добавить игрока</button>
-      <div class="row" style="margin-left:auto">
-        <button id="btn-new" class="btn">🧹 Новая партия</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="cards" class="cards"></div>
-</div>
-
-<!-- FAQ Modal -->
-<div id="faq" class="modal" aria-hidden="true">
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="faq-title">
-    <h3 id="faq-title">ЧАВО — как пользоваться трекером</h3>
-    <div class="muted">Короткая сводка правил и возможностей интерфейса.</div>
-    <div class="faq-grid">
-      <div class="faq-item"><b>Создание игрока.</b> Введите имя, выберите цвет и нажмите «Добавить игрока». Карточка появится ниже. Цвет определяет неоновую подсветку и внешнюю окантовку.</div>
-      <div class="faq-item"><b>Режимы управления HP.</b> Переключатель «Прокрутка/Ввод чисел» в шапке. В «Прокрутке» тяните число HP мышью/пальцем (влево/вниз — урон, вправо/вверх — хил). В «Вводе» — вводите число и жмите «Применить» или Enter.</div>
-      <div class="faq-item"><b>Оверхил.</b> Чекбокс «Оверхил» разрешает HP выше 50. Сумма сверхбазового лечения показывается как (+X).</div>
-      <div class="faq-item"><b>Летопись.</b> Кнопка «📜 Летопись» раскрывает/скрывает журнал действий. Для каждого события пишется время, величина урона/хила и состояние HP до/после.</div>
-      <div class="faq-item"><b>Обнуление.</b> «Новая партия» восстанавливает всех к 50 HP, снимает блокировки и очищает летопись.</div>
-      <div class="faq-item"><b>Блокировка павших.</b> Если HP падает до 0, карточка сереет и блокируется до «Новой партии».</div>
-      <div class="faq-item"><b>Локальное сохранение.</b> Все данные хранятся в вашем браузере (localStorage). Открыв страницу снова — увидите свою последнюю сессию.</div>
-      <div class="faq-item"><b>Мобильные жесты.</b> На телефоне дергаем по числу HP пальцем. Страница блокирует скролл во время перетаскивания.</div>
-    </div>
-    <div class="modal-actions">
-      <button id="faq-close" class="btn btn-acc btn-small">Понятно</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(function(){
-  "use strict";
-  const BASE_HP = 50;
-  const LS = 'sr-html-hp-v32';
-  const $cards = document.getElementById('cards');
-  const $log = document.getElementById('log');
-  const $toplog = document.getElementById('toplog');
-
-  let state = load() || { players:[], allowOverheal:true, log:[], mode:'drag' };
-  document.getElementById('allowOver').checked = !!state.allowOverheal;
-  document.getElementById('mode-drag').checked = state.mode==='drag';
-  document.getElementById('mode-input').checked = state.mode==='input';
-
-  function save(){ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} }
-  function load(){ try{ return JSON.parse(localStorage.getItem(LS)); }catch(e){ return null; } }
-  const now = ()=> new Date().toLocaleTimeString();
-  function addLog(html){ state.log.unshift({t: now(), html}); renderLog(); save(); }
-  function renderLog(){ if($log){ $log.innerHTML = state.log.map(x=>`<li><time>[${x.t}]</time>${x.html}</li>`).join(''); } }
-
-  // Top log toggle
-  document.getElementById('btn-log').addEventListener('click', ()=>{
-    $toplog.classList.toggle('open');
-  });
-
-  // FAQ modal
-  const $faq = document.getElementById('faq');
-  document.getElementById('btn-faq').addEventListener('click', ()=>{ openFaq(); });
-  document.getElementById('faq-close').addEventListener('click', ()=>{ closeFaq(); });
-  $faq.addEventListener('click', (e)=>{ if(e.target===$faq) closeFaq(); });
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && $faq.classList.contains('open')) closeFaq(); });
-
-  function openFaq(){ $faq.classList.add('open'); $faq.setAttribute('aria-hidden','false'); }
-  function closeFaq(){ $faq.classList.remove('open'); $faq.setAttribute('aria-hidden','true'); }
-
-  // Mode toggle
-  document.getElementById('mode-drag').addEventListener('change', (e)=>{ if(e.target.checked){ state.mode='drag'; save(); render(); } });
-  document.getElementById('mode-input').addEventListener('change', (e)=>{ if(e.target.checked){ state.mode='input'; save(); render(); } });
-
-  // Players CRUD
-  document.getElementById('btn-add').addEventListener('click', ()=>{
-    const name = (document.getElementById('pname').value||'Игрок').trim();
-    const color = document.getElementById('pcolor').value;
-    const id = crypto.randomUUID();
-    state.players.push({ id, name, color, hp: BASE_HP, overTotal:0, dead:false });
-    document.getElementById('pname').value='';
-    addLog(`Создана карточка: <b>${escapeHtml(name)}</b>`);
-    render(); save();
-  });
-
-  document.getElementById('allowOver').addEventListener('change', (e)=>{ state.allowOverheal = e.target.checked; save(); render(); });
-  document.getElementById('btn-new').addEventListener('click', ()=>{
-    state.players = state.players.map(p=>({ ...p, hp:BASE_HP, overTotal:0, dead:false }));
-    state.log = [];
-    addLog('Новая партия — все восстановлены до 50 HP');
-    render(); save();
-  });
-
-  function removePlayer(id){ const p = state.players.find(x=>x.id===id); state.players = state.players.filter(x=>x.id!==id); addLog(`Удалена карточка: <b>${escapeHtml(p?.name||id)}</b>`); render(); save(); }
-
-  // HP logic
-  function applyDamage(id, v){
-    if(!v || v<=0) return;
-    const p = state.players.find(x=>x.id===id); if(!p) return;
-    if(p.dead) return; // заблокирован
-    const before = p.hp;
-    p.hp = Math.max(0, p.hp - v);
-    if(p.hp===0){ p.dead = true; }
-    flash(p._hpEl,'dmg');
-    addLog(`<b>${escapeHtml(p.name)}</b> получил урон на <span class="v-red">-${v}</span> (было ${before}) → ${fmtHp(p)}`);
-    render(); save();
-  }
-  function applyHeal(id, v){
-    if(!v || v<=0) return;
-    const p = state.players.find(x=>x.id===id); if(!p) return;
-    if(p.dead) return; // заблокирован
-    const before = p.hp;
-    let after = p.hp + v;
-    let addOver = 0;
-    if(!state.allowOverheal){ after = Math.min(BASE_HP, after); }
-    else {
-      const overBefore = Math.max(0, before - BASE_HP);
-      const overAfter  = Math.max(0, after  - BASE_HP);
-      addOver = Math.max(0, overAfter - overBefore);
-    }
-    p.hp = after;
-    p.overTotal += addOver;
-    flash(p._hpEl,'heal');
-    addLog(`<b>${escapeHtml(p.name)}</b> исцелился на <span class="v-green">+${v}</span> (было ${before}) → ${fmtHp(p)}${addOver>0?` <span class="muted">(+оверхил ${addOver})</span>`:''}`);
-    render(); save();
-  }
-
-  function fmtHp(p){
-    const cur = p.hp; const base = BASE_HP; const over = Math.max(0, p.hp - BASE_HP);
-    return `${cur}/${base}${state.allowOverheal && (p.overTotal>0||over>0)?` <span class="muted">(+${p.overTotal})</span>`:''}`;
-  }
-
-  function flash(el, kind){ if(!el) return; el.classList.remove('flash-heal','flash-dmg'); void el.offsetWidth; el.classList.add(kind==='heal'?'flash-heal':'flash-dmg'); }
-
-  // Render cards
-  function render(){
-    $cards.innerHTML='';
-    state.players.forEach(p=>{
-      const shell = document.createElement('div');
-      shell.className = 'card-shell' + (p.dead?' dead':'');
-      shell.style.setProperty('--glow', p.color);
-
-      const card = document.createElement('div');
-      card.className = 'card' + (p.dead?' dead':'');
-      card.style.setProperty('--glow', p.color);
-      card.innerHTML = `
-        <div class="neon neon-pulse"></div>
-        <div class="neon-edge"></div>
-        <div class="card-inner">
-          <div class="card-header">
-            <button class="btn btn-danger btn-small" data-act="del" title="Удалить">🗑</button>
-            <div class="card-name">${escapeHtml(p.name)}</div>
-            <div style="width:46px"></div>
-          </div>
-          <div class="hp-zone" data-act="drag">
-            <div class="hp-number">${p.hp}</div>
-            <div class="hp-sub">${fmtHp(p)}</div>
-            <div class="delta-overlay" style="display:none"><span class="delta-badge"></span></div>
-            ${state.mode==='drag' ? `<div class="muted" style="font-size:11px;text-align:center;margin-top:6px">Потяните по числу HP (влево/вниз — урон, вправо/вверх — хил)</div>` : ``}
-          </div>
-          ${state.mode==='input' ? `
-          <div class="io">
-            <div>
-              <label>Урон</label>
-              <div class="row">
-                <input class="inp-dmg" inputmode="numeric" placeholder="напр. 5"/>
-                <button class="btn btn-ghost btn-small btn-apply-dmg">Применить</button>
-              </div>
-            </div>
-            <div>
-              <label>Хил</label>
-              <div class="row">
-                <input class="inp-heal" inputmode="numeric" placeholder="напр. 8"/>
-                <button class="btn btn-ghost btn-small btn-apply-heal">Применить</button>
-              </div>
-            </div>
-          </div>` : ``}
-        </div>`;
-
-      card.querySelector('[data-act="del"]').addEventListener('click', ()=> removePlayer(p.id));
-
-      const hpNum = card.querySelector('.hp-number');
-      const sub   = card.querySelector('.hp-sub');
-      p._hpEl = hpNum;
-
-      if(state.mode==='input'){
-        const idmg = card.querySelector('.inp-dmg');
-        const iheal= card.querySelector('.inp-heal');
-        const bDmg = card.querySelector('.btn-apply-dmg');
-        const bHeal= card.querySelector('.btn-apply-heal');
-        idmg.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ const v=+idmg.value||0; idmg.value=''; applyDamage(p.id,v);} });
-        iheal.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ const v=+iheal.value||0; iheal.value=''; applyHeal(p.id,v);} });
-        bDmg.addEventListener('click', ()=>{ const v=+idmg.value||0; idmg.value=''; applyDamage(p.id,v); });
-        bHeal.addEventListener('click', ()=>{ const v=+iheal.value||0; iheal.value=''; applyHeal(p.id,v); });
-      }
-
-      if(state.mode==='drag'){
-        const zone = card.querySelector('.hp-zone');
-        const overlay = card.querySelector('.delta-overlay');
-        const badge = overlay.querySelector('.delta-badge');
-        let dragging=null; 
-        const PX = 12;
-        function start(ev){ if(p.dead) return; ev.preventDefault();
-          const sx = ev.clientX ?? (ev.touches && ev.touches[0]?.clientX) ?? 0;
-          const sy = ev.clientY ?? (ev.touches && ev.touches[0]?.clientY) ?? 0;
-          dragging = { sx, sy, delta:0 };
-          overlay.style.display='flex';
-          document.addEventListener('pointermove', move);
-          document.addEventListener('pointerup', end);
-          document.addEventListener('touchmove', move, { passive:false });
-          document.addEventListener('touchend', end);
-        }
-        function move(ev){ if(!dragging) return;
-          const x = ev.clientX ?? (ev.touches && ev.touches[0]?.clientX) ?? dragging.sx;
-          const y = ev.clientY ?? (ev.touches && ev.touches[0]?.clientY) ?? dragging.sy;
-          const dx=x-dragging.sx; const dy=dragging.sy-y;
-          const primary = Math.abs(dx)>=Math.abs(dy)? dx: dy;
-          let d = Math.trunc(primary / PX);
-          const min = -p.hp; const max = state.allowOverheal? 999 : (BASE_HP - p.hp);
-          if(d<min) d=min; if(d>max) d=max;
-          dragging.delta=d;
-          badge.textContent = d>0? ('+'+d) : (d<0? d : '0');
-          badge.style.color = d>0? '#34d399' : (d<0? '#f87171':'#9fb0c7');
-          hpNum.textContent = Math.max(0, Math.min(p.hp + d, state.allowOverheal? 9999: BASE_HP));
-          sub.innerHTML = fmtHp(p);
-        }
-        function end(){ if(!dragging) return; const val = dragging.delta|0; overlay.style.display='none'; dragging=null; if(val>0) applyHeal(p.id,val); else if(val<0) applyDamage(p.id,-val); }
-        zone.addEventListener('pointerdown', start);
-        zone.addEventListener('touchstart', start, { passive:false });
-      }
-
-      shell.appendChild(card);
-      $cards.appendChild(shell);
-    });
-  }
-
-  function escapeHtml(s){ return s.replace(/[&<>\"']/g, (c)=> ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;','\'':'&#39;'}[c]) ); }
-
-  // init
-  render();
-  renderLog();
-})();
-</script>
-</body>
+		<script type="module" src="assets/js/main.js"></script>
+	</body>
 </html>
