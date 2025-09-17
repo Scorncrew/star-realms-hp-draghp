@@ -1,8 +1,8 @@
 import { addPlayer } from './player.js';
-import { addLog } from './log.js';
+import { addLog, renderLog } from './log.js';
 import { render } from './render.js';
 
-function setupAddPlayerModal(state, $addPlayerModal, $addPlayerBtn, $addPlayerCancel, $addPlayerSubmit, $pname, $pcolor, $cards, $panelContent) {
+function setupAddPlayerModal(state, $addPlayerModal, $addPlayerBtn, $addPlayerCancel, $addPlayerSubmit, $pname, $pcolor, $cards, $panelContent, $log) {
 	function openAddPlayerModal() {
 		$addPlayerModal.classList.add('open');
 		$addPlayerModal.setAttribute('aria-hidden', 'false');
@@ -22,6 +22,7 @@ function setupAddPlayerModal(state, $addPlayerModal, $addPlayerBtn, $addPlayerCa
 			const logMsg = addPlayer(state, name, color);
 			addLog(state, logMsg);
 			render(state, $cards, $panelContent);
+			renderLog(state, $log);
 			closeAddPlayerModal();
 		}
 	}
