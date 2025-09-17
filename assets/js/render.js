@@ -1,7 +1,7 @@
-import { BASE_HP, save } from '/assets/js/state.js';
-import { escapeHtml, flash } from '/assets/js/domUtils.js';
-import { applyDamage, applyHeal, fmtHp, removePlayer } from '/assets/js/player.js';
-import { addLog } from '/assets/js/log.js';
+import { BASE_HP, save } from './state.js';
+import { escapeHtml, flash } from './domUtils.js';
+import { applyDamage, applyHeal, fmtHp, removePlayer } from './player.js';
+import { addLog } from './log.js';
 
 function render(state, $cards, $panelContent) {
 	if (!$cards) return; // Prevent setting innerHTML on undefined
