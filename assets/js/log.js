@@ -1,4 +1,4 @@
-import { save } from './assets/js/state.js'; //не факт что сработает
+import { save } from '/assets/js/state.js';
 
 function addLog(state, html) {
 	state.log.unshift({ t: new Date().toLocaleTimeString(), html });
