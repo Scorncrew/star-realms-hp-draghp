@@ -3,20 +3,20 @@
 	<head>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Star Realms — HP Tracker (mobile landscape compact)</title>
+		<title>Star Realms (v3.2 mobile landscape compact)</title>
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-		<link rel="stylesheet" type="text/css" href="assets/css/base.css">
-		<link rel="stylesheet" type="text/css" href="assets/css/card.css">
-		<link rel="stylesheet" type="text/css" href="assets/css/panel.css">
-		<link rel="stylesheet" type="text/css" href="assets/css/modal.css">
-		<link rel="stylesheet" type="text/css" href="assets/css/buttons.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/c/base.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/c/card.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/c/panel.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/c/modal.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/c/buttons.css">
 		<link rel="icon" type="image/png" href="../favicon.png" />
 	</head>
 	<body>
 		<div class="wrap">
 			<div class="panel">
 				<div class="panel-header">
-					<h1>⭐ Star Realms — HP трекер</h1>
+					<h1><i class="fa-solid fa-shuttle-space"></i> Star Realms — Трекер <i class="fa-solid fa-rocket"></i></h1>
 					<button id="btn-toggle-panel" class="btn-toggle" title="Свернуть/развернуть панель">▼</button>
 				</div>
 				<div id="panel-content" class="panel-content">
@@ -24,12 +24,13 @@
 						<button id="btn-add-player" class="btn btn-dsg-acc btn-small" title="Добавить игрока"><i class="fa-solid fa-user-plus"></i></button>
 						<div class="row">
 							<div class="seg" role="tablist" aria-label="Режим управления HP">
-								<input type="radio" id="mode-drag" name="mode" value="drag" checked><label for="mode-drag"><img style="width: 25px;" src="assets/img/touch-swipe-svgrepo-com.svg"></label>
-								<input type="radio" id="mode-input" name="mode" value="input"><label for="mode-input"><img style="width: 25px;" src="assets/img/input-numbers.svg"></label>
+								<input type="radio" id="mode-drag" name="mode" value="drag" checked><label for="mode-drag">тач <i class="fa-solid fa-mobile-screen-button"></i></label>
+								<input type="radio" id="mode-input" name="mode" value="input"><label for="mode-input"><i class="fa-solid fa-calculator"></i> ввод</label>
 							</div>
 							<button id="btn-log" class="btn btn-ghost btn-small"><i class="fa-solid fa-scroll" style="color: yellow;"></i></button>
 							<button id="btn-faq" class="btn btn-ghost btn-small"><i class="fa-solid fa-question" style="color: red;"></i></button>
-							<label class="badge"><input type="checkbox" id="allowOver" checked> <i class="fa-solid fa-notes-medical" style="color: green;"></i></label>
+							<label class="badge" style="display:none"><input type="checkbox" id="allowOver" checked> <i class="fa-solid fa-notes-medical" style="color: green;"></i></label>
+							<button id="btn-first-turn" type="button" class="btn btn-ghost btn-small btn-firstt"  style="color: purple;" title="Кто ходит первым?"><i class="fa-solid fa-person-walking-arrow-right"></i></button>
 							<button id="btn-new" class="btn"><i class="fa-solid fa-repeat"></i></button>
 						</div>
 					</div>
@@ -98,6 +99,18 @@
 			</div>
 		</div>
 
-		<script type="module" src="assets/js/main.js"></script>
+		<!-- Новый модал для первого хода -->
+		<div id="first-turn-modal" class="modal" aria-hidden="true">
+			<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="first-turn-title">
+				<h3 id="first-turn-title">Кто ходит первым?</h3>
+				<button id="btn-first-turn-close-x" class="btn-modal-close" title="Закрыть">×</button>
+				<div id="first-player-name" class="first-player-name muted" style="font-size: 18px; text-align: center; margin: 20px 0;"></div>  <!-- Здесь отображается имя -->
+				<div class="modal-actions">
+					<button id="first-turn-close" class="btn btn-acc btn-small">Понятно</button>
+				</div>
+			</div>
+		</div>
+
+		<script type="module" src="assets/js/c/main.js"></script>
 	</body>
 </html>
