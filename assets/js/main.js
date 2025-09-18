@@ -1,6 +1,6 @@
 import { getInitialState, save } from './state.js';
 import { addLog, renderLog } from './log.js';
-import { setupAddPlayerModal, setupFaqModal } from './modal.js';
+import { setupAddPlayerModal, setupFaqModal, setupFirstTurnModal } from './modal.js';
 import { render } from './render.js';
 import { resetGame } from './player.js';
 
@@ -23,6 +23,11 @@ import { resetGame } from './player.js';
 	const $btnFaqCloseX = document.getElementById('btn-faq-close-x');
 	const $faqClose = document.getElementById('faq-close');
 	const $btnLog = document.getElementById('btn-log');
+	const $firstTurnModal = document.getElementById('first-turn-modal');
+	const $btnFirstTurn = document.getElementById('btn-first-turn');
+	const $btnFirstTurnCloseX = document.getElementById('btn-first-turn-close-x');
+	const $firstTurnClose = document.getElementById('first-turn-close');
+	const $firstPlayerName = document.getElementById('first-player-name');
 
 	document.getElementById('allowOver').checked = !!state.allowOverheal;
 	document.getElementById('mode-drag').checked = state.mode === 'drag';
@@ -98,6 +103,7 @@ import { resetGame } from './player.js';
 
 	setupAddPlayerModal(state, $addPlayerModal, $addPlayerBtn, $addPlayerCancel, $addPlayerSubmit, $pname, $pcolor, $cards, $panelContent, $log);
 	setupFaqModal($faq, $btnFaq, $btnFaqCloseX, $faqClose);
+	setupFirstTurnModal(state, $firstTurnModal, $btnFirstTurn, $btnFirstTurnCloseX, $firstTurnClose, $firstPlayerName, $log);
 
 	render(state, $cards, $panelContent, $log);
 	renderLog(state, $log);

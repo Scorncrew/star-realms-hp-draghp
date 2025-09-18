@@ -1,6 +1,7 @@
 import { addPlayer } from './player.js';
 import { addLog, renderLog } from './log.js';
 import { render } from './render.js';
+import { escapeHtml } from './domUtils.js';
 
 function setupAddPlayerModal(state, $addPlayerModal, $addPlayerBtn, $addPlayerCancel, $addPlayerSubmit, $pname, $pcolor, $cards, $panelContent, $log) {
 	function openAddPlayerModal() {
@@ -21,7 +22,7 @@ function setupAddPlayerModal(state, $addPlayerModal, $addPlayerBtn, $addPlayerCa
 		if (name) {
 			const logMsg = addPlayer(state, name, color);
 			addLog(state, logMsg);
-			render(state, $cards, $panelContent);
+			render(state, $cards, $panelContent, $log);
 			renderLog(state, $log);
 			closeAddPlayerModal();
 		}
@@ -63,4 +64,36 @@ function setupFaqModal($faq, $btnFaq, $btnFaqCloseX, $faqClose) {
 	});
 }
 
-export { setupAddPlayerModal, setupFaqModal };
+function setupFirstTurnModal(state, $modal, $btn, $closeX, $close, $nameEl, $log) {  // Новая функция
+	function openModal() {
+		if (state.players.length < 2) {
+			alert('Нужны минимум 2 игрока для выбора первого хода!');
+			return;
+		}
+		const randomIndex = Math.floor(Math.random() * state.players.length);
+		const player = state.players[randomIndex];
+		$nameEl.innerHTML = `<b>${escapeHtml(player.name)}</b> ходит первым!`;  // Отображаем имя
+		const logMsg = `Первый ход: <b>${escapeHtml(player.name)}</b>`;
+		addLog(state, logMsg);  // Добавляем в лог
+		renderLog(state, $log);  // Обновляем лог сразу
+		$modal.classList.add('open');
+		$modal.setAttribute('aria-hidden', 'false');
+	}
+
+	function closeModal() {
+		$modal.classList.remove('open');
+		$modal.setAttribute('aria-hidden', 'true');
+	}
+
+	$btn.addEventListener('click', openModal);
+	$closeX.addEventListener('click', closeModal);
+	$close.addEventListener('click', closeModal);
+	$modal.addEventListener('click', (e) => {
+		if (e.target === $modal) closeModal();
+	});
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape' && $modal.classList.contains('open')) closeModal();
+	});
+}
+
+export { setupAddPlayerModal, setupFaqModal, setupFirstTurnModal };

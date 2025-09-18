@@ -19,7 +19,7 @@ function render(state, $cards, $panelContent, $log) {
 			<div class="neon-edge"></div>
 			<div class="card-inner">
 				<div class="card-header">
-					<button class="btn btn-danger btn-small" data-act="del" title="Удалить">🗑</button>
+					<button class="btn btn-danger btn-small" data-act="del" title="Удалить"><i class="fa-solid fa-trash"></i></button>
 					<div class="card-name">${escapeHtml(p.name)}</div>
 					<div style="width:46px"></div>
 				</div>
